@@ -1,7 +1,8 @@
 const { request } = require("express");
 
 exports.userSignupValidator = (req, res, next) => {
-  req.check("name", "Name is required").notEmpty();
+  req.check("firstname", "First name is required").notEmpty();
+  req.check("secondname", "Second name is required").notEmpty();
   req
     .check("email", "Email must be between 3-32 characters")
     .matches(/.+\@..+/)
@@ -14,10 +15,10 @@ exports.userSignupValidator = (req, res, next) => {
     .withMessage("Password must contain at least 6 characters")
     .matches(/\d/)
     .withMessage("Password must contain a number");
-    const errors = req.validationErrors();
-    if (errors) {
-        const firstError= errors.map(err => err.msg)[0];
-        return res.status(400).json({error: firstError})
-    }
-    next();
+  const errors = req.validationErrors();
+  if (errors) {
+    const firstError = errors.map(err => err.msg)[0];
+    return res.status(400).json({ error: firstError })
+  }
+  next();
 };

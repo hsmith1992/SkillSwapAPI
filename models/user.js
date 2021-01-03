@@ -2,14 +2,23 @@ const mongoose = require("mongoose");
 const crypto = require("crypto");
 const { v1: uuidv1 } = require("uuid");
 const { timeStamp } = require("console");
+const { ObjectId } = mongoose.Schema;
+const skill = require("./skill");
+
 
 const userSchema = new mongoose.Schema(
   {
-    name: {
+    firstname: {
       type: String,
       trim: true,
       required: true,
-      maxlength: 32,
+      maxlength: 16,
+    },
+    secondname: {
+      type: String,
+      trime: true,
+      required: true,
+      maxlength: 16,
     },
     email: {
       type: String,
@@ -21,6 +30,28 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    address: {
+      houseNo: {
+        type: String,
+        required: true,
+      },
+      street: {
+        type: String,
+        required: true,
+      },
+      town: {
+        type: String,
+        required: true,
+      },
+      area: {
+        type: String,
+        required: true,
+      },
+      postcode: {
+        type: String,
+        required: true,
+      }
+    },
     about: {
       type: String,
       trim: true,
@@ -30,9 +61,47 @@ const userSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
-    history: {
+    currentSwaps: {
+      type: Array,
+      default: []
+    },
+    swapHistory: {
       type: Array,
       default: [],
+    },
+    skills: {
+      skillId: {
+        type: ObjectId,
+        ref: "Category",
+        required: true,
+        maxlength: 32,
+      },
+      level: {
+        type: Number,
+        required: true
+      },
+      completed: {
+        type: Number,
+        default: 0,
+      }
+
+      // _id: {
+      //   type: String,
+      //   required: true
+      // },
+      // name: {
+      //   type: String,
+      //   required: true
+      // },
+
+    },
+    interests: {
+      type: Array,
+      default: []
+    },
+    profilePicture: {
+      data: Buffer,
+      contentType: String,
     },
   },
   { timestamps: true }

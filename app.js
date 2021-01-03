@@ -8,10 +8,12 @@ const cors = require("cors");
 const morgan = require("morgan");
 const expressValidator = require("express-validator");
 
+//Load Routes
 const authRoutes = require("./routes/auth");
 const userRoutes = require("./routes/user");
 const categoryRoutes = require("./routes/category");
 const productRoutes = require("./routes/product");
+const skillRoutes = require("./routes/skill");
 
 //middleware
 app.use(morgan("dev"));
@@ -26,6 +28,7 @@ app.use("/api", authRoutes);
 app.use("/api", userRoutes);
 app.use("/api", categoryRoutes);
 app.use("/api", productRoutes);
+app.use("/api", skillRoutes);
 
 // db
 mongoose
@@ -41,6 +44,7 @@ mongoose.connection.on("error", (err) => {
   console.log(`DB Connection eroor: ${err}`);
 });
 
+//Initiate App
 const port = process.env.PORT || 8000;
 app.listen(port, () => {
   console.log(`Server is running on port: ${port}`);
