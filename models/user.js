@@ -33,23 +33,18 @@ const userSchema = new mongoose.Schema(
     address: {
       houseNo: {
         type: String,
-        required: true,
       },
       street: {
         type: String,
-        required: true,
       },
       town: {
         type: String,
-        required: true,
       },
       area: {
         type: String,
-        required: true,
       },
       postcode: {
         type: String,
-        required: true,
       }
     },
     about: {
@@ -70,11 +65,11 @@ const userSchema = new mongoose.Schema(
       default: [],
     },
     skills: {
-      skillId: {
+      type: Array,
+      skill: {
         type: ObjectId,
-        ref: "Category",
+        ref: "Skill",
         required: true,
-        maxlength: 32,
       },
       level: {
         type: Number,
@@ -82,18 +77,7 @@ const userSchema = new mongoose.Schema(
       },
       completed: {
         type: Number,
-        default: 0,
-      }
-
-      // _id: {
-      //   type: String,
-      //   required: true
-      // },
-      // name: {
-      //   type: String,
-      //   required: true
-      // },
-
+      },
     },
     interests: {
       type: Array,

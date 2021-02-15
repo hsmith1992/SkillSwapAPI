@@ -14,6 +14,7 @@ const userRoutes = require("./routes/user");
 const categoryRoutes = require("./routes/category");
 const productRoutes = require("./routes/product");
 const skillRoutes = require("./routes/skill");
+const swapRoutes = require("./routes/swap");
 
 //middleware
 app.use(morgan("dev"));
@@ -29,6 +30,7 @@ app.use("/api", userRoutes);
 app.use("/api", categoryRoutes);
 app.use("/api", productRoutes);
 app.use("/api", skillRoutes);
+app.use("/api", swapRoutes);
 
 // db
 mongoose

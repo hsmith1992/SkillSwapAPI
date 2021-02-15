@@ -1,16 +1,12 @@
 const Skill = require("../models/skill");
-const { errorHandler } = require("../helpers/dbErrorHandler");
 
 
 exports.create = (req, res) => {
     const skill = new Skill(req.body);
-    skill.save((err, data) => {
-        if (err) {
-            return res.status(400).json({
-                error: errorHandler(err)
-            })
+    skill.save((error, data) => {
+        if (error) {
+            return res.status(400).json({ error })
         }
-
         res.json({ data });
 
     })
@@ -34,12 +30,10 @@ exports.read = (req, res) => {
 
 exports.update = ((req, res) => {
     const skill = req.skill;
-    skill.name = req.body.skill;
-    skill.save((err, data) => {
-        if (err) {
-            res.status(400).json({
-                error: err
-            })
+    skill.name = req.body.skill.toLowerCase();
+    skill.save((error, data) => {
+        if (error) {
+            res.status(400).json({ error })
         }
         res.json(data)
     })
@@ -60,11 +54,9 @@ exports.remove = ((req, res) => {
 })
 
 exports.list = ((req, res) => {
-    Skill.find().exec((err, data) => {
-        if (err) {
-            res.status(400).json({
-                error: err
-            })
+    Skill.find().exec((error, data) => {
+        if (error) {
+            res.status(400).json({ error })
         }
         res.json(data);
     })

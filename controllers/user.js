@@ -2,6 +2,8 @@ const User = require("../models/user");
 const formidable = require("formidable");
 const _ = require("lodash");
 const fs = require("fs");
+const swap = require("../models/swap");
+//const e = require("express"); Remove if no effect
 
 exports.userById = (req, res, next, id) => {
   User.findById(id).exec((err, user) => {
@@ -37,7 +39,7 @@ exports.updateProfile = (req, res) => {
       }
 
       //Check for all fields
-      const { firstname, secondname, email } = user;
+      const { firstname, secondname, email } = profile;
       if (
         !firstname ||
         !secondname ||
@@ -47,16 +49,13 @@ exports.updateProfile = (req, res) => {
           error: "All fields are required",
         });
       }
-
       profile.profilePicture.data = fs.readFileSync(files.profilePicture.path);
       profile.profilePicture.contentType = files.profilePicture.type;
     }
 
     profile.save((err, result) => {
-      if (err) {
-        res.status(400).json({
-          error: err,
-        });
+      if (error) {
+        res.status(400).json({ error });
       } else {
         res.json({ result });
       }
@@ -70,6 +69,14 @@ exports.read = (req, res) => {
   req.profile.profilePicture = undefined;
   return res.json(req.profile);
 };
+
+exports.publicRead = (req, res) => {
+  User.findById(req.params.userId2).exec((error, user) => {
+    if (error) return res.status(400).json(error);
+    user.hashed_password = user.salt = user.role = user.profilePicture = user.address = user.email = user.swapHistory = user.currentSwaps = undefined;
+    res.json(user);
+  })
+}
 
 exports.update = (req, res) => {
   User.findOneAndUpdate(
@@ -94,7 +101,6 @@ exports.profilePicture = (req, res) => {
     res.set('Content-Type', req.profile.profilePicture.contentType);
     return res.send(req.profile.profilePicture.data);
   }
-  next();
 }
 
 exports.updateSkills = (req, res) => {
@@ -103,20 +109,42 @@ exports.updateSkills = (req, res) => {
     level: req.body.level,
     completed: 0,
   }
+
+  let skills = req.profile.skills.map(i => i.skill._id);
+  if (skills.includes(req.skill._id)) {
+    User.findOneAndUpdate(
+      { _id: req.profile._id, "skills.skill._id": req.skill._id },
+      { $set: { "skills.$.level": skill.level } },
+      (error, a) => {
+        if (error) {
+          return res.status(400).json({ error });
+        }
+        res.json(a)
+      })
+  } else {
+    User.findOneAndUpdate(
+      { _id: req.profile._id },
+      { $addToSet: { skills: skill } },
+      (err, user) => {
+        if (err) {
+          return res.status(400).json({
+            error: "You are not authorised to perform this action",
+          });
+        }
+        res.json(user.skills);
+      }
+    );
+  }
+};
+
+exports.removeSkill = (req, res) => {
   User.findOneAndUpdate(
     { _id: req.profile._id },
-    { skills: skill },
-    { new: true },
-    (err, user) => {
-      if (err) {
-        return res.status(400).json({
-          error: "You are not authorised to perform this action",
-        });
-      }
-      res.json(user.skills);
-    }
-  );
-};
+    { $pull: { "skills": { "skill._id": req.skill._id } } }, { new: true },
+    (error) => { res.status(400).json({ error }) }
+  )
+  res.json({ msg: "Skill Removed" });
+}
 
 exports.updateInterests = (req, res) => {
   User.findOneAndUpdate(
@@ -167,4 +195,23 @@ exports.skills = (req, res) => {
 
 exports.interests = (req, res) => {
   return res.json(req.profile.interests);
+}
+exports.about = (req, res) => {
+  return res.json(req.profile.about);
+}
+
+exports.updateAbout = (req, res) => {
+  User.findByIdAndUpdate(
+    { _id: req.profile._id },
+    { about: req.body.about },
+    { new: true },
+    (error, user) => {
+      if (error) {
+        return res.status(400).json({
+          error
+        })
+      }
+      res.json(user.about);
+    }
+  )
 }
